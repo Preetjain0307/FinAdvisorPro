@@ -179,12 +179,14 @@ export default function LoginPage() {
                                 <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
                                 <div className="relative flex justify-center text-xs uppercase"><span className="bg-white px-2 text-muted-foreground dark:bg-gray-950">Or</span></div>
                             </div>
-                            <form action={signInWithGoogle}>
-                                <Button variant="outline" className="w-full mt-4" type="submit">
-                                    <Chrome className="mr-2 h-4 w-4" />
-                                    Continue with Google
-                                </Button>
-                            </form>
+                            <Button
+                                variant="outline"
+                                className="w-full mt-4"
+                                onClick={() => signInWithGoogle()}
+                            >
+                                <Chrome className="mr-2 h-4 w-4" />
+                                Continue with Google
+                            </Button>
                             <div className="mt-6 text-center">
                                 <Link href="/admin/login" className="text-sm text-blue-600 hover:underline">
                                     Admin Login
