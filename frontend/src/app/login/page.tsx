@@ -183,6 +183,7 @@ export default function LoginPage() {
                                 variant="outline"
                                 className="w-full mt-4"
                                 onClick={() => signInWithGoogle()}
+                            // Fixed for Vercel Deployment
                             >
                                 <Chrome className="mr-2 h-4 w-4" />
                                 Continue with Google
