@@ -1,0 +1,19 @@
+# Ignore dependencies in all subfolders
+**/node_modules
+**/.pnpm-store
+
+# Ignore build outputs
+**/.next
+**/out
+**/build
+**/dist
+
+# Ignore secrets
+.env
+.env.local
+**/.env
+**/.env.local
+
+# Ignore system files
+.DS_Store
+Thumbs.db
