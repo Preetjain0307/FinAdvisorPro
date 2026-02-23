@@ -1,157 +1,187 @@
-/**
- * Market Data Utility Functions
- * 
- * Fetches and manages live stock price data from Alpha Vantage
- */
-
-export interface MarketData {
+export type MarketAsset = {
+    id: string
     symbol: string
+    name: string
     price: number
-    change: number
-    changePercent: string
-    volume: number
-    lastUpdated: string
-    previousClose: number
+    change: number // %
+    volume: string
+    category: "Stock" | "Bond" | "FD" | "Crypto" | "Forex"
+    // Stock/Equity specific
+    pe?: number
+    marketCap?: string
+    // FD/Debt specific
+    interestRate?: number
+    lockIn?: string
+    // Rating
+    aiScore: number // 0-100
+    // Actions
+    actionLink?: string
+    description?: string
 }
 
-export interface MarketDataResponse {
-    success: boolean
-    data?: MarketData
-    error?: string
-    timestamp: string
-    rateLimited?: boolean
-    fallback?: boolean
+const COMPANIES = [
+    "Reliance Industries", "TCS", "HDFC Bank", "ICICI Bank", "Infosys", "Hindustan Unilever", "ITC", "SBI", "Bharti Airtel", "L&T",
+    "Bajaj Finance", "Asian Paints", "HCL Tech", "Maruti Suzuki", "Sun Pharma", "Titan", "Avenue Supermarts", "UltraTech Cement", "Nestle India", "Wipro",
+    "ONGC", "M&M", "NTPC", "Power Grid", "Tata Motors", "Adani Enterprises", "JSW Steel", "Tata Steel", "Coal India", "Grasim",
+    "Britannia", "Tech Mahindra", "Hindalco", "Apollo Hospitals", "Eicher Motors", "Divi's Lab", "Dr Reddy", "Cipla", "BPCL", "Bajaj Auto",
+    "Hero MotoCorp", "UPL", "Tata Consumer", "IndusInd Bank", "SBI Life", "HDFC Life", "Adani Ports", "Bajaj Finserv", "Kotak Bank", "LTIMindtree"
+]
+
+export const generateStocks = (): MarketAsset[] => {
+    return COMPANIES.map((name, idx) => ({
+        id: `STK-${idx}`,
+        symbol: name.toUpperCase().substring(0, 4) + (Math.random() > 0.5 ? "" : "LTD"),
+        name: name,
+        price: Math.round(Math.random() * 5000) + 100,
+        change: Number((Math.random() * 4 - 2).toFixed(2)), // -2% to +2%
+        volume: `${(Math.random() * 50).toFixed(1)}M`,
+        category: "Stock",
+        pe: Number((Math.random() * 40 + 10).toFixed(1)),
+        marketCap: `${(Math.random() * 20).toFixed(1)}L Cr`,
+        aiScore: Math.round(Math.random() * 40 + 50), // 50-90
+        actionLink: `https://www.google.com/finance/quote/${name.toUpperCase().substring(0, 4)}:NSE`,
+        description: `Large cap stock in ${name.includes("Bank") ? "Banking" : "Technology/Infra"} sector.`
+    }))
 }
 
-// In-memory cache for market data
-const cache = new Map<string, { data: MarketDataResponse; timestamp: number }>()
-const CACHE_DURATION = 60 * 1000 // 60 seconds (Client side cache matching API)
+const BANKS = ["SBI", "HDFC", "ICICI", "Axis", "Kotak", "Punjab National", "Canara", "Union Bank", "Bank of Baroda", "IDFC First", "IndusInd", "Yes Bank"]
 
-// Rate Limiting Queue System
-const RATE_LIMIT_DELAY = 15000 // 15 seconds between calls (4 calls/min to be safe)
-let requestQueue: { symbol: string; resolve: (value: MarketDataResponse) => void }[] = []
-let isProcessingQueue = false
-
-async function processQueue() {
-    if (isProcessingQueue || requestQueue.length === 0) return
-
-    isProcessingQueue = true
-
-    while (requestQueue.length > 0) {
-        const item = requestQueue.shift()
-        if (!item) break
-
-        try {
-            // Fetch the data
-            const res = await fetch(`/api/market-data?symbol=${item.symbol}`)
-            const data: MarketDataResponse = await res.json()
-
-            // Cache successful responses
-            if (data.success) {
-                cache.set(item.symbol, { data, timestamp: Date.now() })
-            }
-
-            item.resolve(data)
-        } catch (error) {
-            console.error(`Failed to fetch price for ${item.symbol}:`, error)
-            item.resolve({
-                success: false,
-                error: 'Network error',
-                timestamp: new Date().toISOString()
-            })
-        }
-
-        // Wait before next request to respect rate limit
-        if (requestQueue.length > 0) {
-            await new Promise(resolve => setTimeout(resolve, RATE_LIMIT_DELAY))
-        }
-    }
-
-    isProcessingQueue = false
+export const generateFDs = (): MarketAsset[] => {
+    return BANKS.map((name, idx) => ({
+        id: `FD-${idx}`,
+        symbol: `${name.toUpperCase()} FD`,
+        name: `${name} Fixed Deposit`,
+        price: 1000,
+        change: 0,
+        volume: "Unlimited",
+        category: "FD",
+        interestRate: Number((Math.random() * 3 + 5).toFixed(2)), // 5-8%
+        lockIn: `${Math.floor(Math.random() * 5 + 1)} Years`,
+        aiScore: Math.round(Math.random() * 30 + 60),
+        actionLink: `https://www.google.com/search?q=${name}+fixed+deposit+rates`,
+        description: `High safety fixed deposit from ${name}.`
+    }))
 }
 
-/**
- * Fetch live price for a stock symbol
- * Uses a queue system to prevent rate limiting
- */
-export function fetchLivePrice(symbol: string): Promise<MarketDataResponse> {
-    // Check cache first
-    const cached = cache.get(symbol)
-    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-        return Promise.resolve(cached.data)
-    }
-
-    // Return a promise that resolves when the queue processes this request
-    return new Promise((resolve) => {
-        requestQueue.push({ symbol, resolve })
-        processQueue()
-    })
+export const generateBonds = (): MarketAsset[] => {
+    const bonds = [
+        "GOI 2030", "REC Tax Free", "NHAI AAA", "PFC Bond", "Sovereign Gold Bond", "Tata Capital NCD", "Muthoot Finance NCD", "Shriram Transport",
+        "L&T Infra Bond", "HDFC Corp Bond", "LIC Housing Bond", "NABARD Bond", "IRFC Tax Free", "HUDCO Bond", "Power Finance Corp"
+    ]
+    return bonds.map((name, idx) => ({
+        id: `BND-${idx}`,
+        symbol: name.split(" ")[0].toUpperCase(),
+        name: name,
+        price: Math.round(Math.random() * 200 + 1000),
+        change: Number((Math.random() * 1 - 0.5).toFixed(2)),
+        volume: "High",
+        category: "Bond",
+        interestRate: Number((Math.random() * 4 + 6).toFixed(2)), // 6-10%
+        aiScore: Math.round(Math.random() * 20 + 70)
+    }))
 }
 
-/**
- * Fetch prices for multiple symbols
- */
-export async function fetchMultiplePrices(symbols: string[]): Promise<Map<string, MarketDataResponse>> {
-    const results = new Map<string, MarketDataResponse>()
-
-    // Fetch sequentially to avoid rate limits
-    for (const symbol of symbols) {
-        const data = await fetchLivePrice(symbol)
-        results.set(symbol, data)
-
-        // Small delay between requests to be respectful of API limits
-        await new Promise(resolve => setTimeout(resolve, 200))
-    }
-
-    return results
+export const generateCrypto = (): MarketAsset[] => {
+    const coins = [
+        { name: "Bitcoin", symbol: "BTC", price: 5200000 },
+        { name: "Ethereum", symbol: "ETH", price: 280000 },
+        { name: "Solana", symbol: "SOL", price: 12000 },
+        { name: "Binance Coin", symbol: "BNB", price: 32000 },
+        { name: "Ripple", symbol: "XRP", price: 55 },
+        { name: "Cardano", symbol: "ADA", price: 45 },
+        { name: "Avalanche", symbol: "AVAX", price: 3500 },
+        { name: "Dogecoin", symbol: "DOGE", price: 12 },
+        { name: "Polkadot", symbol: "DOT", price: 650 },
+        { name: "Polygon", symbol: "MATIC", price: 85 }
+    ]
+    return coins.map((c, idx) => ({
+        id: `CRY-${idx}`,
+        symbol: c.symbol,
+        name: c.name,
+        price: c.price,
+        change: Number((Math.random() * 10 - 5).toFixed(2)),
+        volume: "Very High",
+        category: "Crypto",
+        marketCap: `${(Math.random() * 50 + 10).toFixed(1)}T`,
+        aiScore: Math.round(Math.random() * 60 + 20),
+        actionLink: `https://coinmarketcap.com/currencies/${c.name.toLowerCase().replace(" ", "-")}/`,
+        description: "Decentralized digital currency based on blockchain technology."
+    }))
 }
 
-/**
- * Format price change for display
- */
-export function formatPriceChange(change: number, changePercent: string): {
-    formatted: string
-    color: 'green' | 'red' | 'gray'
-    icon: '↑' | '↓' | '→'
-} {
-    if (change > 0) {
-        return {
-            formatted: `+${change.toFixed(2)} (${changePercent})`,
-            color: 'green',
-            icon: '↑'
-        }
-    } else if (change < 0) {
-        return {
-            formatted: `${change.toFixed(2)} (${changePercent})`,
-            color: 'red',
-            icon: '↓'
-        }
-    } else {
-        return {
-            formatted: `0.00 (0%)`,
-            color: 'gray',
-            icon: '→'
-        }
-    }
+export const generateHomeLoans = (): MarketAsset[] => {
+    const lenders = [
+        { name: "SBI Home Loan", url: "https://homeloans.sbi" },
+        { name: "HDFC Reach", url: "https://www.hdfc.com/home-loans" },
+        { name: "ICICI Home", url: "https://www.icicibank.com/personal-banking/loans/home-loan" },
+        { name: "LIC Housing", url: "https://www.lichousing.com/" },
+        { name: "Bajaj Housing", url: "https://www.bajajhousingfinance.in/" },
+        { name: "Kotak Home", url: "https://www.kotak.com/en/personal-banking/loans/home-loan.html" },
+        { name: "PNB Housing", url: "https://www.pnbhousing.com/" },
+        { name: "Axis Home", url: "https://www.axisbank.com/retail/loans/home-loan" },
+        { name: "BoB Home", url: "https://www.bankofbaroda.in/personal-banking/loans/home-loan" },
+        { name: "Union Home", url: "https://www.unionbankofindia.co.in/english/home-loan.aspx" }
+    ]
+    return lenders.map((l, idx) => ({
+        id: `LOAN-${idx}`,
+        symbol: l.name.split(" ")[0].toUpperCase(),
+        name: l.name,
+        price: 0,
+        change: 0,
+        volume: "N/A",
+        category: "Bond",
+        interestRate: Number((Math.random() * 1.5 + 8.3).toFixed(2)),
+        lockIn: "Nil",
+        aiScore: Math.round(Math.random() * 30 + 60),
+        actionLink: l.url,
+        description: "Floating rate home loan with zero prepayment charges."
+    }))
 }
 
-/**
- * Clear cache (useful for testing)
- */
-export function clearCache() {
-    cache.clear()
+export const generateInsurancePlans = (): MarketAsset[] => {
+    const plans = [
+        { name: "HDFC Ergo Optima", url: "https://www.hdfcergo.com/" },
+        { name: "Niva Bupa ReAssure", url: "https://www.nivabupa.com/" },
+        { name: "Star Health Assure", url: "https://www.starhealth.in/" },
+        { name: "ICICI Lombard iHealth", url: "https://www.icicilombard.com/" },
+        { name: "Care Supreme", url: "https://www.careinsurance.com/" },
+        { name: "Tata AIG Medicare", url: "https://www.tataaig.com/" },
+        { name: "Aditya Birla Activ", url: "https://www.adityabirlacapital.com/" },
+        { name: "ManipalCigna Pro", url: "https://www.manipalcigna.com/" },
+        { name: "SBI General Health", url: "https://www.sbigeneral.in/" },
+        { name: "Bajaj Allianz", url: "https://www.bajajallianz.com/" }
+    ]
+    return plans.map((p, idx) => ({
+        id: `INS-${idx}`,
+        symbol: p.name.split(" ")[0].toUpperCase(),
+        name: p.name + " Health",
+        price: Math.round(Math.random() * 5000 + 10000),
+        change: 0,
+        volume: "High",
+        category: "Bond",
+        marketCap: "₹5L Cover",
+        aiScore: Math.round(Math.random() * 20 + 75),
+        actionLink: p.url,
+        description: "Comprehensive health coverage with cashless hospitalization."
+    }))
 }
 
-/**
- * Get cache statistics
- */
-export function getCacheStats() {
+export const fetchLivePrice = async (symbol: string) => {
+    // Simulate API delay
+    // In a real app, this would fetch from AlphaVantage/Yahoo Finance
+    await new Promise(resolve => setTimeout(resolve, 500))
+
+    // Generate random price movement around a base
+    const basePrice = Math.random() * 2000 + 100
+    const change = (Math.random() * 20) - 10
+    const changePercent = (change / basePrice) * 100
+
     return {
-        size: cache.size,
-        entries: Array.from(cache.entries()).map(([symbol, { timestamp }]) => ({
-            symbol,
-            age: Date.now() - timestamp,
-            expired: Date.now() - timestamp > CACHE_DURATION
-        }))
+        success: true,
+        data: {
+            price: Number(basePrice.toFixed(2)),
+            change: Number(change.toFixed(2)),
+            changePercent: `${change > 0 ? '+' : ''}${changePercent.toFixed(2)}%`
+        }
     }
 }

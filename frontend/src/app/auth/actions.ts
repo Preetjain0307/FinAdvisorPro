@@ -27,6 +27,13 @@ export async function loginWithEmail(email: string) {
     return { success: true }
 }
 
+export async function loginWithPassword(email: string, password: string) {
+    const supabase = await createClient()
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) return { error: error.message }
+    return { success: true }
+}
+
 export async function sendTextBeeOtp(phone: string) {
     const supabase = await createClient()
 
@@ -241,16 +248,18 @@ export async function verifyOtp(email: string, token: string, rememberMe: boolea
 export async function signOut() {
     const supabase = await createClient()
     await supabase.auth.signOut()
-    redirect('/login')
+    redirect('/')
 }
 
 export async function signInWithGoogle() {
     const supabase = await createClient()
 
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-            redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback`,
+            redirectTo: `${siteUrl}/auth/callback`,
             queryParams: {
                 access_type: 'offline',
                 prompt: 'consent',
