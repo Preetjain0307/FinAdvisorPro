@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import {
   ArrowRight, BarChart3, ShieldCheck, TrendingUp, LineChart, Lock,
   LayoutDashboard, Phone, ChevronDown, Sparkles, Zap, Globe, Award,
-  Users, Star
+  Users, Star, AlertCircle, Menu, X
 } from 'lucide-react'
 import { SiteFooter } from '@/components/site-footer'
 import {
@@ -41,6 +41,8 @@ const fadeIn = {
 function TiltCard({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   const ref = useRef<HTMLDivElement>(null)
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Disable tilt on mobile/touch devices
+    if (window.matchMedia('(pointer: coarse)').matches) return
     const el = ref.current
     if (!el) return
     const rect = el.getBoundingClientRect()
@@ -105,6 +107,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const { scrollY } = useScroll()
   const heroOpacity = useTransform(scrollY, [0, 400], [1, 0])
@@ -208,6 +211,7 @@ export default function HomePage() {
           </motion.div>
         </div>
 
+        {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
           {/* About */}
           <DropdownMenu>
@@ -347,7 +351,144 @@ export default function HomePage() {
               </DropdownMenuContent>
             </DropdownMenu>
           )}
+
+          {/* Mobile Menu Toggle */}
+          <div className="md:hidden">
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 rounded-lg bg-white/5 border border-white/10 text-white"
+            >
+              {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Menu Overlay */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.2 }}
+              className="absolute top-16 left-0 right-0 bg-white dark:bg-gray-950 border-b border-white/20 dark:border-white/10 shadow-lg md:hidden"
+            >
+              <nav className="flex flex-col p-4 text-sm font-medium">
+                <Link href="/about/story" className="py-2 hover:text-blue-500 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Our Story</Link>
+                <Link href="/about/advisors" className="py-2 hover:text-blue-500 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Our Qualified Financial Advisors</Link>
+                <Link href="#contact" className="py-2 hover:text-blue-500 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Contact</Link>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="flex items-center justify-between py-2 hover:text-blue-500 transition-colors outline-none group">
+                      Planning Tools <ChevronDown className="h-4 w-4 group-hover:rotate-180 transition-transform duration-200" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-full">
+                    <DropdownMenuItem asChild><Link href="/planning/budget" className="cursor-pointer">Income &amp; Expense</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link href="/planning/investment" className="cursor-pointer">Investment Planning</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link href="/planning/insurance" className="cursor-pointer">Insurance Planning</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link href="/planning/loan" className="cursor-pointer">Loan Planning</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link href="/planning/estate" className="cursor-pointer">Will &amp; Estate</Link></DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild><Link href="/planning" className="cursor-pointer font-semibold text-blue-600">Planning Centre</Link></DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="flex items-center justify-between py-2 hover:text-blue-500 transition-colors outline-none group">
+                      Calculators <ChevronDown className="h-4 w-4 group-hover:rotate-180 transition-transform duration-200" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-full">
+                    <DropdownMenuItem asChild><Link href="/calculators/sip" className="cursor-pointer font-medium text-green-600">SIP Calculator (Smart)</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link href="/calculators/emi" className="cursor-pointer font-medium text-orange-600">EMI Calculator</Link></DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild><Link href="/calculators/retirement" className="cursor-pointer">Retirement Planner</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link href="/calculators/gratuity" className="cursor-pointer">Gratuity Calculator</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link href="/calculators/refinance" className="cursor-pointer">Loan Refinance</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link href="/calculators/advance-tax" className="cursor-pointer">Advance Tax Calc</Link></DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/calculators" className="flex w-full items-center justify-center font-bold text-blue-600">View All Calculators →</Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="flex items-center justify-between py-2 hover:text-blue-500 transition-colors outline-none group">
+                      Rankings <ChevronDown className="h-4 w-4 group-hover:rotate-180 transition-transform duration-200" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-full">
+                    <DropdownMenuItem asChild><Link href="/ranking/mutual-fund" className="cursor-pointer">Mutual Funds</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link href="/ranking/credit-card" className="cursor-pointer">Best Credit Cards</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link href="/ranking/stocks" className="cursor-pointer text-red-600 font-medium">Live Top Stocks</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link href="/ranking/crypto" className="cursor-pointer text-orange-600">Crypto Live</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link href="/ranking/loan" className="cursor-pointer">Home Loans</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link href="/ranking/insurance" className="cursor-pointer">Best Insurance</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link href="/ranking/nps" className="cursor-pointer">NPS Funds</Link></DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <Link href="/market" className="flex items-center gap-1 py-2 hover:text-blue-500 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
+                  Market{' '}
+                  <span className="ml-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-yellow-400/20 text-yellow-600 border border-yellow-400/30 animate-pulse">LIVE</span>
+                </Link>
+                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-800">
+                  {user ? (
+                    <Link href="/dashboard">
+                      <Button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg btn-glow" onClick={() => setIsMobileMenuOpen(false)}>
+                        <LayoutDashboard className="mr-2 h-4 w-4" /> Dashboard
+                      </Button>
+                    </Link>
+                  ) : (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg btn-glow">
+                          Login / Register
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start" className="w-full mt-1 p-1.5">
+                        <DropdownMenuItem asChild>
+                          <Link href="/login" className="flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer" onClick={() => setIsMobileMenuOpen(false)}>
+                            <div className="w-7 h-7 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
+                              <LayoutDashboard className="h-3.5 w-3.5 text-blue-600" />
+                            </div>
+                            <div>
+                              <div className="font-semibold text-sm">User Portal</div>
+                              <div className="text-xs text-gray-400">Investors & members</div>
+                            </div>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href="/admin/login" className="flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer" onClick={() => setIsMobileMenuOpen(false)}>
+                            <div className="w-7 h-7 rounded-lg bg-violet-100 flex items-center justify-center shrink-0">
+                              <ShieldCheck className="h-3.5 w-3.5 text-violet-600" />
+                            </div>
+                            <div>
+                              <div className="font-semibold text-sm">Admin Console</div>
+                              <div className="text-xs text-gray-400">Platform management</div>
+                            </div>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href="/caller/login" className="flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer" onClick={() => setIsMobileMenuOpen(false)}>
+                            <div className="w-7 h-7 rounded-lg bg-emerald-100 flex items-center justify-center shrink-0">
+                              <Phone className="h-3.5 w-3.5 text-emerald-600" />
+                            </div>
+                            <div>
+                              <div className="font-semibold text-sm">Caller Panel</div>
+                              <div className="text-xs text-gray-400">Consultation agents</div>
+                            </div>
+                          </Link>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
+                </div>
+              </nav>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.header>
 
       <main className="flex-1">
@@ -463,7 +604,7 @@ export default function HomePage() {
             </motion.div>
 
             <motion.h1
-              className="text-5xl md:text-7xl font-black tracking-tight leading-tight mb-6 text-white text-glow-white"
+              className="text-4xl md:text-7xl font-black tracking-tight leading-tight mb-6 text-white text-glow-white px-2"
               variants={fadeUp}
               initial="hidden"
               animate="visible"

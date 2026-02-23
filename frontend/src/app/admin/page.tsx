@@ -114,16 +114,16 @@ export default async function AdminDashboard() {
                                     </span>
                                 )}
                             </div>
-                            <div className="grid grid-cols-4 gap-6">
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-4">
                                 {[
                                     { label: "Total", val: totalCalls, icon: Phone, c: 'text-cyan-400' },
                                     { label: "Converted", val: converted, icon: CheckCircle2, c: 'text-emerald-400' },
                                     { label: "Pending", val: pendingCalls, icon: Clock, c: 'text-amber-400' },
-                                    { label: "Today's Leads", val: todayLeads, icon: Zap, c: 'text-purple-400' },
+                                    { label: "Today Leads", val: todayLeads, icon: Zap, c: 'text-purple-400' },
                                 ].map(m => (
-                                    <div key={m.label}>
-                                        <div className={`text-2xl font-black ${m.c}`}>{m.val}</div>
-                                        <div className="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
+                                    <div key={m.label} className="bg-white/5 rounded-xl p-3 border border-white/5">
+                                        <div className={`text-xl md:text-2xl font-black ${m.c}`}>{m.val}</div>
+                                        <div className="text-[10px] md:text-xs text-slate-500 mt-0.5 flex items-center gap-1">
                                             <m.icon className={`h-3 w-3 ${m.c}`} /> {m.label}
                                         </div>
                                     </div>

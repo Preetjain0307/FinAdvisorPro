@@ -135,13 +135,13 @@ export default async function DashboardPage() {
                         backgroundSize: '40px 40px'
                     }} />
 
-                    <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-6 md:p-8">
+                    <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6 p-6 md:p-8">
                         <div>
                             <div className="text-blue-200 text-sm mb-1 flex items-center gap-2">
                                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
                                 {greeting}, {firstName} 👋
                             </div>
-                            <h1 className="text-3xl font-black text-white mb-2">Your Financial Dashboard</h1>
+                            <h1 className="text-2xl md:text-3xl font-black text-white mb-2">Your Financial Dashboard</h1>
                             <p className="text-blue-200 text-sm">Everything you need to master your financial future</p>
                         </div>
                         <div className="flex gap-3 shrink-0">

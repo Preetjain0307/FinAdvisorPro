@@ -46,8 +46,8 @@ export function DashboardNavbar({ userProfile }: DashboardNavbarProps) {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
             className={`sticky top-0 z-50 transition-all duration-300 ${scrolled
-                    ? 'bg-white/85 dark:bg-gray-950/85 backdrop-blur-xl shadow-lg border-b border-white/20 dark:border-white/5'
-                    : 'bg-white dark:bg-gray-950 border-b border-gray-100 dark:border-white/5'
+                ? 'bg-white/85 dark:bg-gray-950/85 backdrop-blur-xl shadow-lg border-b border-white/20 dark:border-white/5'
+                : 'bg-white dark:bg-gray-950 border-b border-gray-100 dark:border-white/5'
                 }`}
         >
             <div className="container mx-auto px-6 h-16 flex justify-between items-center">
@@ -168,21 +168,50 @@ export function DashboardNavbar({ userProfile }: DashboardNavbarProps) {
                     </Link>
                 </div>
 
-                {/* User Actions */}
-                <div className="flex items-center gap-3">
+                {/* User Actions & Mobile Menu */}
+                <div className="flex items-center gap-2 md:gap-3">
                     <div className="hidden md:flex flex-col items-end mr-1">
                         <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 leading-none">
                             {userProfile?.full_name || 'Investor'}
                         </p>
                         <p className="text-xs text-blue-500 leading-none mt-0.5">Premium Member</p>
                     </div>
-                    <Link href="/settings">
+                    <Link href="/settings" className="hidden sm:block">
                         <Button variant="outline" size="sm" className="border-gray-200 hover:border-blue-300 hover:text-blue-600 transition-all gap-1.5">
                             <Settings2 className="h-3.5 w-3.5" />
                             Settings
                         </Button>
                     </Link>
-                    <LogoutButton variant="outline" />
+
+                    {/* Mobile Menu Trigger */}
+                    <div className="md:hidden">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" size="icon" className="h-9 w-9 rounded-lg border-gray-200">
+                                    <Layers className="h-4 w-4 text-blue-600" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-56 mt-2">
+                                <DropdownMenuLabel>Quick Navigation</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem asChild><Link href="/dashboard"><LayoutDashboard className="mr-2 h-4 w-4" /> Dashboard</Link></DropdownMenuItem>
+                                <DropdownMenuItem asChild><Link href="/advisor"><Bot className="mr-2 h-4 w-4" /> AI Advisor</Link></DropdownMenuItem>
+                                <DropdownMenuItem asChild><Link href="/market"><Zap className="mr-2 h-4 w-4" /> Market Explorer</Link></DropdownMenuItem>
+                                <DropdownMenuItem asChild><Link href="/planning"><PieChart className="mr-2 h-4 w-4" /> Planning Centre</Link></DropdownMenuItem>
+                                <DropdownMenuItem asChild><Link href="/calculators"><Calculator className="mr-2 h-4 w-4" /> All Calculators</Link></DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem asChild><Link href="/settings"><Settings2 className="mr-2 h-4 w-4" /> Settings</Link></DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <div className="p-1">
+                                    <LogoutButton variant="outline" className="w-full justify-start border-none h-8 px-2" />
+                                </div>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+
+                    <div className="hidden md:block">
+                        <LogoutButton variant="outline" />
+                    </div>
                 </div>
             </div>
         </motion.header>

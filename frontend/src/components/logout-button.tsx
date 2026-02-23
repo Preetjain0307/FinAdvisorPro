@@ -5,7 +5,7 @@ import { LogOut } from 'lucide-react'
 import { signOut } from '@/app/auth/actions'
 import { useState } from 'react'
 
-export function LogoutButton({ variant = 'ghost' }: { variant?: 'ghost' | 'outline' | 'default' | 'destructive' }) {
+export function LogoutButton({ variant = 'ghost', className = '' }: { variant?: 'ghost' | 'outline' | 'default' | 'destructive', className?: string }) {
     const [loading, setLoading] = useState(false)
 
     const handleLogout = async () => {
@@ -14,7 +14,7 @@ export function LogoutButton({ variant = 'ghost' }: { variant?: 'ghost' | 'outli
     }
 
     return (
-        <Button variant={variant} size="sm" onClick={handleLogout} disabled={loading}>
+        <Button variant={variant} size="sm" onClick={handleLogout} disabled={loading} className={className}>
             <LogOut className="mr-2 h-4 w-4" />
             {loading ? 'Exiting...' : 'Logout'}
         </Button>

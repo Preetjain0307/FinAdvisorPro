@@ -162,7 +162,7 @@ function RegisterForm() {
                             <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.25 }}>
                                 <div className="mb-6">
-                                    <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-1">Create Profile</h1>
+                                    <h1 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white mb-1">Create Profile</h1>
                                     <p className="text-gray-500 dark:text-gray-400 text-sm">Step 1 of {formData.phone ? '2' : '1'} — Basic details</p>
                                 </div>
 
@@ -228,7 +228,7 @@ function RegisterForm() {
                                         className="flex items-center gap-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-sm mb-3 transition-colors">
                                         <ArrowLeft className="h-4 w-4" /> Back
                                     </button>
-                                    <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-1">Verify Phone</h1>
+                                    <h1 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white mb-1">Verify Phone</h1>
                                     <p className="text-gray-500 dark:text-gray-400 text-sm">
                                         Code sent to <span className="font-semibold text-gray-900 dark:text-white">{formData.phone}</span>
                                     </p>

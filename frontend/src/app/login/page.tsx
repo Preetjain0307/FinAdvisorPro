@@ -191,9 +191,9 @@ export default function LoginPage() {
                         {step === 'identifier' ? (
                             <motion.div key="identifier" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}>
-                                <div className="mb-8">
-                                    <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-2">Welcome back 👋</h1>
-                                    <p className="text-gray-500 dark:text-gray-400">Sign in or create your free account</p>
+                                <div className="mb-6 md:mb-8">
+                                    <h1 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white mb-2">Welcome back 👋</h1>
+                                    <p className="text-gray-500 dark:text-gray-400 text-sm">Sign in or create your free account</p>
                                 </div>
 
                                 <form onSubmit={handleCheckUser} className="space-y-5">
