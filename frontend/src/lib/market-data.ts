@@ -185,3 +185,24 @@ export const fetchLivePrice = async (symbol: string) => {
         }
     }
 }
+
+export type MarketDataResponse = {
+    success: boolean
+    data?: {
+        price: number
+        change: number
+        changePercent: string
+    }
+    error?: string
+    rateLimited?: boolean
+}
+
+export function formatPriceChange(change: number, changePercent: string) {
+    if (change > 0) {
+        return { color: 'green', icon: '▲', formatted: `+${change.toFixed(2)} (${changePercent})` }
+    } else if (change < 0) {
+        return { color: 'red', icon: '▼', formatted: `${change.toFixed(2)} (${changePercent})` }
+    } else {
+        return { color: 'gray', icon: '●', formatted: `0.00 (${changePercent})` }
+    }
+}
